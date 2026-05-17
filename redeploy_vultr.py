@@ -18,9 +18,9 @@ try:
     # We will try both
     print("--- Running git pull and docker compose rebuild ---")
     cmd = """
-    cd /root/actionpilot || cd /root/vantage_point
+    cd /root/vantage_point
     git pull
-    sudo docker compose up --build -d backend
+    sudo docker compose up --build -d
     """
     stdin, stdout, stderr = ssh.exec_command(cmd)
     print("STDOUT:", stdout.read().decode('utf-8', errors='ignore'))

@@ -15,8 +15,8 @@ const getApiBaseUrl = () => {
   
   if (envUrl) return envUrl;
   
-  // Default fallback
-  return isDev ? 'http://localhost:8000' : '';
+  // Default fallback - point directly to the whitelisted Vultr VM backend
+  return isDev ? 'http://localhost:8000' : 'http://216.128.155.55:8000';
 };
 
 export const API_BASE_URL = getApiBaseUrl();

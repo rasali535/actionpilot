@@ -43,7 +43,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ onClose, onUploadComplete }) 
       formData.append('file', file);
       
       // Call actual backend
-      const response = await axios.post(`${API_BASE_URL}/api/trading/process-invoice`, formData, {
+      const response = await axios.post(`${API_BASE_URL}/api/trading/invoice`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 

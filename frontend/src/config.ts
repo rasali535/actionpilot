@@ -2,27 +2,21 @@
  * API Configuration
  * 
  * In development, we use the local FastAPI server (http://localhost:8000).
- * In production (Vercel), we use the relative path /api which is proxied 
- * to the Python serverless function via vercel.json rewrites.
+ * In production (Vercel), all /api/* requests are proxied to the Vultr backend
+ * via vercel.json rewrites — so we use a relative path '' to avoid Mixed Content errors.
  */
 
 const getApiBaseUrl = () => {
-  // Check if we are in development mode
-  const isDev = import.meta.env.DEV;
-  
-  // Use VITE_API_URL if provided in .env, otherwise fallback to defaults
+  // Use VITE_API_URL if explicitly provided (e.g. in local .env)
   const envUrl = import.meta.env.VITE_API_URL;
-  
   if (envUrl) return envUrl;
-  
-  // If we are in the browser and loading over HTTPS (Vercel production), 
-  // we MUST use relative URLs to avoid Mixed Content security blocks.
-  if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
-    return '';
-  }
-  
-  // Default fallback - point directly to the whitelisted Vultr VM backend
-  return isDev ? 'http://localhost:8000' : 'http://216.128.155.55:8000';
+
+  // In dev mode, point directly to local backend
+  if (import.meta.env.DEV) return 'http://localhost:8000';
+
+  // In production (HTTPS on Vercel), always use relative path ''
+  // so requests go through vercel.json proxy rewrites → Vultr backend
+  return '';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
@@ -30,12 +24,5 @@ export const API_BASE_URL = getApiBaseUrl();
 // Helper to construct API endpoints
 export const apiPath = (path: string) => {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  
-  // If we're using a relative path (production), we need to ensure it's /api/...
-  // but the backend routes already include /api in many cases.
-  // Let's check the backend routes in main.py.
-  // app.include_router(..., prefix="/api/meetings")
-  // So a call to '/api/meetings/upload' is already correct.
-  
   return `${API_BASE_URL}${cleanPath}`;
 };

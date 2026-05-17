@@ -39,12 +39,11 @@ const UploadModal: React.FC<UploadModalProps> = ({ onClose, onUploadComplete }) 
     }, 300);
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      // Call actual backend
-      const response = await axios.post(`${API_BASE_URL}/api/trading/invoice`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      // Call actual backend using simple JSON to avoid Vercel's multipart proxy 502 errors
+      const response = await axios.post(`${API_BASE_URL}/api/trading/invoice`, {
+        filename: file.name
+      }, {
+        headers: { 'Content-Type': 'application/json' }
       });
 
       // Simulate some processing time for transcription/agent

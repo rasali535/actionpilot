@@ -35,20 +35,27 @@ To meet the challenge of "realistic future-of-work use cases," we leverage speci
 
 ---
 
-## 🏆 Vultr Hackathon Specializations
+## 🏆 Hackathon Challenge Alignments
 
-### ☁️ Vultr-Native Deployment
+Vantage-Point 2.0 was explicitly built to seamlessly integrate all five technology partners into a unified, enterprise-grade autonomous workflow:
 
-- **Containerized Excellence**: The entire stack (Backend, Frontend, MongoDB) is containerized for seamless deployment to **Vultr Cloud Compute** instances.
-- **Performance Optimized**: Leverages Vultr's high-speed CPU performance to run the **Kraken CLI** natively inside the backend container.
+### 1. ☁️ Vultr (Enterprise Infrastructure & Serverless Inference)
+- **Vultr VM Backend Deployment**: The system of record and execution engine is deployed natively on a Vultr cloud instance, orchestrated via Docker.
+- **Vultr Serverless Inference**: Powers the **Operations Agent (Llama 3 8B)**, demonstrating seamless multi-cloud LLM orchestration.
 
-### 🐙 Kraken xStocks Integration
+### 2. 🧠 Google Gemini (Advanced Reasoning & Multimodal)
+- **CEO Agent**: Powered by **Gemini 1.5 Flash/Pro**, this agent handles complex, multi-step decision-making, synthesizing input from the entire boardroom council to form a final execution strategy.
+- **Multimodal Intelligence**: Analyzes visual business reports and static financial documents to unlock richer interactions.
 
-Vantage-Point is built specifically for the **Kraken CLI**, enabling autonomous trading of tokenized U.S. equities (xStocks) directly from a corporate treasury dashboard.
+### 3. 🐙 Kraken (Programmatic xStocks Execution)
+- **Kraken CLI**: Acts as the execution layer. The agent forms a strategy and programmatically executes trades on tokenized U.S. equities (**xStocks**) without any human intervention.
 
-### 🎭 Multimodal Ingestion
+### 4. 🪶 Featherless (Domain-Specialized Open-Source Agents)
+- **General Counsel (DeepSeek-V3)**: A domain-specialized compliance auditor running via Featherless Serverless Inference.
+- **Macro Strategist (Qwen-2.5-72B)**: A domain-specialized risk officer providing deep contextual reasoning on market volatility.
 
-Ingests real-world enterprise documents (Invoices, Tax Forms) using **Gemini 1.5 Flash**, converting static liabilities into active "Float Events."
+### 5. 🎙️ Speechmatics (Voice-Powered Executive Interface)
+- **Real-Time Voice Ingestion**: Executives can verbally dictate market strategies or submit voice-memos of urgent financial events. Speechmatics transcribes this audio in real-time, converting unstructured speech into actionable "Float Events" for the autonomous boardroom.
 
 ---
 
@@ -63,7 +70,8 @@ Ingests real-world enterprise documents (Invoices, Tax Forms) using **Gemini 1.5
 
 ## 🛠 Tech Stack
 
-- **AI**: Gemini 1.5 Flash, DeepSeek-V3, Qwen-2.5-72B, Llama 3 8B (Vultr Inference).
+- **AI Models**: Gemini 1.5 Flash, DeepSeek-V3, Qwen-2.5-72B, Llama 3 8B.
+- **APIs**: Vultr Serverless Inference, Featherless API, Speechmatics API, Google AI Studio.
 - **Backend**: FastAPI, MongoDB, Kraken CLI v0.3.2.
 - **Frontend**: React (Vite), TypeScript, Nginx.
 - **Infrastructure**: Docker, Docker Compose, Vultr Cloud.

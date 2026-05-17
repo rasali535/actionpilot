@@ -15,6 +15,12 @@ const getApiBaseUrl = () => {
   
   if (envUrl) return envUrl;
   
+  // If we are in the browser and loading over HTTPS (Vercel production), 
+  // we MUST use relative URLs to avoid Mixed Content security blocks.
+  if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+    return '';
+  }
+  
   // Default fallback - point directly to the whitelisted Vultr VM backend
   return isDev ? 'http://localhost:8000' : 'http://216.128.155.55:8000';
 };

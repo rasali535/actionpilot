@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "http://216.128.155.55.vultrusercontent.com:8000/api/$1"
+      "destination": "http://216.128.155.55:8000/api/$1"
     },
     {
       "source": "/(.*)",

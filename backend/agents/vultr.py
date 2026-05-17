@@ -4,10 +4,10 @@ from openai import OpenAI
 # Initialize the client using Vultr credentials
 client = OpenAI(
     api_key=os.environ.get("VULTR_INFERENCE_API_KEY"),
-    base_url="https://api.vultr.com/v1/inference" # Confirm exact endpoint in your portal
+    base_url="https://api.vultrinference.com/v1" # Correct Vultr Serverless Inference endpoint
 )
 
-def query_enterprise_agent(prompt, model="llama3-8b-instruct"):
+def query_enterprise_agent(prompt, model="llama-3.1-70b-instruct-fp8"):
     response = client.chat.completions.create(
         model=model,
         messages=[

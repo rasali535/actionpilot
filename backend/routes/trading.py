@@ -111,6 +111,16 @@ async def get_audit_logs():
 @router.get("/boardroom")
 async def get_boardroom_history():
     """Deliberation history for the council"""
+    db = await get_database()
+    if db is not None:
+        try:
+            db_history = await db.boardroom_history.find().sort("timestamp", -1).limit(20).to_list(length=20)
+            if db_history:
+                for h in db_history:
+                    h["id"] = str(h.pop("_id"))
+                return db_history
+        except Exception as e:
+            print(f"Error fetching boardroom history: {e}")
     return deliberation_history
 
 @router.post("/scan")
@@ -131,7 +141,13 @@ async def scan_and_trade():
     
     # 2. Boardroom Deliberation
     decision = await boardroom.deliberate(ticker, ohlc, trading_pair)
-    deliberation_history.insert(0, {**decision, "timestamp": datetime.now().isoformat(), "pair": trading_pair})
+    delib_entry = {**decision, "timestamp": datetime.now().isoformat(), "pair": trading_pair}
+    deliberation_history.insert(0, delib_entry)
+    if db is not None:
+        try:
+            await db.boardroom_history.insert_one(dict(delib_entry))
+        except Exception as e:
+            print(f"Error inserting boardroom history to DB: {e}")
     
     # 3. Audit Log Entry
     audit_entry = {

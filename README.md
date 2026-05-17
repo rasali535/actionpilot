@@ -1,6 +1,6 @@
 # 🌌 Vantage-Point 2.0: Autonomous Enterprise Treasury
 
-**Vantage-Point 2.0** is an AI-native autonomous treasury engine built for the **AI Agent Olympics Hackathon**. It solves the "$1.2 Trillion SMB Cash Drag" by transforming idle corporate capital into yield-bearing assets through an agentic boardroom orchestration.
+**Vantage-Point 2.0** is an AI-native autonomous treasury engine built for the **Vultr x Gemini Hackathon**. It solves the "$1.2 Trillion SMB Cash Drag" by transforming idle corporate capital into yield-bearing assets through an agentic boardroom orchestration.
 
 🟢 **Live Demo (Vultr Hosted):** [http://216.128.155.55](http://216.128.155.55)
 
@@ -96,4 +96,4 @@ curl -sSL https://raw.githubusercontent.com/rasali535/vantage_point/main/vultr-i
 
 ---
 
-Built with precision by **Antigravity** for the **Vultr x Gemini Hackathon**.
+Built with precision by **Ras Ali Labs** for the **AI Agent Olympics Hackathon

@@ -3,7 +3,12 @@ import { TrendingUp, DollarSign, Activity, ShoppingCart, RefreshCcw } from 'luci
 import { API_BASE_URL } from '../config';
 import BoardroomCouncil from './BoardroomCouncil';
 
-const TradingView = () => {
+interface TradingViewProps {
+  autoStartScan?: boolean;
+  onScanStarted?: () => void;
+}
+
+const TradingView = ({ autoStartScan, onScanStarted }: TradingViewProps) => {
   const [status, setStatus] = useState<any>(null);
   const [scanning, setScanning] = useState(false);
   const [lastDecision, setLastDecision] = useState<any>(null);
@@ -13,6 +18,15 @@ const TradingView = () => {
     const interval = setInterval(fetchStatus, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (autoStartScan && !scanning) {
+      runScanner();
+      if (onScanStarted) {
+        onScanStarted();
+      }
+    }
+  }, [autoStartScan]);
 
   const fetchStatus = async () => {
     try {
@@ -106,7 +120,7 @@ const TradingView = () => {
 
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          <BoardroomCouncil decision={lastDecision} />
+          <BoardroomCouncil decision={lastDecision} scanning={scanning} />
           
           {/* Recent Trades */}
           <div className="glass card">

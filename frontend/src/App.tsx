@@ -204,6 +204,7 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [status, setStatus] = useState<any>(null);
+  const [triggerScanOnLoad, setTriggerScanOnLoad] = useState(false);
 
   useEffect(() => {
     fetchStatus();
@@ -224,8 +225,9 @@ const App: React.FC = () => {
   const handleUploadComplete = () => {
     setShowUploadModal(false);
     fetchStatus();
-    // Redirect to dashboard to see the new entry
-    setActiveTab('dashboard');
+    // Redirect to Kraken Terminal (Hedge Fund) tab to begin council deliberation
+    setActiveTab('trading');
+    setTriggerScanOnLoad(true);
   };
 
   return (
@@ -285,7 +287,12 @@ const App: React.FC = () => {
             onRefresh={fetchStatus}
           />
         )}
-        {activeTab === 'trading' && <TradingView />}
+        {activeTab === 'trading' && (
+          <TradingView 
+            autoStartScan={triggerScanOnLoad} 
+            onScanStarted={() => setTriggerScanOnLoad(false)} 
+          />
+        )}
         {activeTab === 'meetings' && (
           <div className="animate-fade-in">
             <h2>Treasury Ledger</h2>

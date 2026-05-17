@@ -13,6 +13,13 @@ class KrakenAgent:
         self.api_key = os.getenv("KRAKEN_API_KEY")
         self.api_secret = os.getenv("KRAKEN_API_SECRET")
         self.asset_class = "tokenized_asset"
+        self.mock_usd = 100000.0
+        self.mock_holdings = {}
+        self.invoice_expenses = 0.0
+
+    def add_expense(self, amount: float):
+        """Register a treasury outflow (invoice expense) to deduct from USD balance"""
+        self.invoice_expenses += amount
 
     async def _run_cli(self, args: List[str]) -> str:
         """Executes Kraken CLI commands with a fallback for environments without the CLI (Vercel)."""
@@ -112,17 +119,56 @@ class KrakenAgent:
 
     async def get_paper_status(self) -> Dict:
         res = self._run(["paper", "status"])
+        if res.get("mock") and "not initialized" in res.get("error", "").lower():
+            # Auto-initialize paper account programmatically if it got wiped out
+            init_res = self._run(["paper", "init", "--balance", "100000", "--currency", "USD", "--yes"])
+            if not init_res.get("mock"):
+                res = self._run(["paper", "status"])
+                
         if res.get("mock"):
-            return {"current_value": 10000.0, "holdings": {}, "currency": "USD"}
+            if self.invoice_expenses > 0:
+                self.mock_usd = max(0, self.mock_usd - self.invoice_expenses)
+                self.invoice_expenses = 0.0
+            return {
+                "current_value": self.mock_usd,
+                "holdings": self.mock_holdings,
+                "currency": "USD"
+            }
+            
+        # For real CLI mode, deduct invoice expenses and merge custom mock stock transactions
+        res["current_value"] = max(0, res.get("current_value", 100000.0) - (100000.0 - self.mock_usd) - self.invoice_expenses)
+        if self.mock_holdings:
+            real_holdings = res.get("holdings", {})
+            for k, v in self.mock_holdings.items():
+                real_holdings[k] = real_holdings.get(k, 0) + v
+            res["holdings"] = real_holdings
+            
         return res
 
     async def execute_trade(self, symbol: str, side: str, volume: float) -> Dict:
         """Executes a paper trade for the demo"""
-        # Mapping symbol for paper trading (BTC/USD)
         pair = symbol if "/" in symbol else f"{symbol}/USD"
         res = self._run(["paper", side.lower(), pair, str(volume), "--yes"])
         
+        if res.get("mock") and "not initialized" in res.get("error", "").lower():
+            # Auto-initialize paper account programmatically and retry
+            init_res = self._run(["paper", "init", "--balance", "100000", "--currency", "USD", "--yes"])
+            if not init_res.get("mock"):
+                res = self._run(["paper", side.lower(), pair, str(volume), "--yes"])
+                
         if res.get("mock"):
+            # Update mock balance in-memory to simulate balance changes for invalid pairs (stocks)
+            price = 180.0 if "AAPL" in symbol else 75000.0
+            cost = price * volume
+            if side.lower() == "buy":
+                self.mock_usd = max(0, self.mock_usd - cost)
+                self.mock_holdings[symbol] = round(self.mock_holdings.get(symbol, 0) + volume, 6)
+            elif side.lower() == "sell":
+                self.mock_usd = self.mock_usd + cost
+                self.mock_holdings[symbol] = max(0, round(self.mock_holdings.get(symbol, 0) - volume, 6))
+                if self.mock_holdings[symbol] == 0:
+                    self.mock_holdings.pop(symbol, None)
+                    
             return {
                 "action": "market_order_filled",
                 "mode": "paper",
@@ -130,7 +176,8 @@ class KrakenAgent:
                 "pair": pair,
                 "side": side.lower(),
                 "volume": volume,
-                "status": "success"
+                "status": "success",
+                "price": price
             }
         return res
 

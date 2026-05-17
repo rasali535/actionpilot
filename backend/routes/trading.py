@@ -181,6 +181,8 @@ async def manual_trade(request: Request):
     
     k_agent = get_kraken_agent()
     result = await k_agent.execute_trade(pair, action.lower(), volume)
+    
+    price = float(result.get("price", 180.0 if "AAPL" in pair else 75000.0))
         
     db = await get_database()
     trade_entry = {
@@ -188,7 +190,7 @@ async def manual_trade(request: Request):
         "symbol": pair,
         "side": action.lower(),
         "volume": volume,
-        "price": 0.0,
+        "price": price,
         "timestamp": datetime.now().isoformat(),
         "status": "filled",
         "reasoning": "Manual Override"
@@ -204,12 +206,17 @@ async def process_invoice():
     """Multimodal Extraction: Ingest invoice and update ledger"""
     extraction = await multimodal_agent.extract_invoice("sample_invoice.pdf")
     
+    amount = float(extraction.get("total_amount", 0.0))
+    
+    k_agent = get_kraken_agent()
+    k_agent.add_expense(amount)
+    
     db = await get_database()
     trade_entry = {
         "order_id": f"INV-{os.urandom(3).hex().upper()}",
         "symbol": "USD/OUT",
         "side": "expense",
-        "volume": extraction.get("total_amount"),
+        "volume": amount,
         "price": 1.0,
         "timestamp": datetime.now().isoformat(),
         "status": "processed",

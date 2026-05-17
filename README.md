@@ -2,7 +2,7 @@
 
 **Vantage-Point 2.0** is an AI-native autonomous treasury engine built for the **Vultr x Gemini Hackathon**. It solves the "$1.2 Trillion SMB Cash Drag" by transforming idle corporate capital into yield-bearing assets through an agentic boardroom orchestration.
 
-🟢 **Live Demo (Vultr Hosted):** [http://216.128.155.55.vultrusercontent.com](http://216.128.155.55.vultrusercontent.com)
+🟢 **Live Demo (Vultr Hosted):** [http://216.128.155.55](http://216.128.155.55)
 
 ---
 
@@ -16,11 +16,13 @@ graph TD
     B --> C[🦁 CEO: Gemini 1.5 Flash]
     B --> D[⚖️ General Counsel: DeepSeek-V3]
     B --> E[📉 Risk Officer: Qwen-2.5-72B]
+    B --> I[⚙️ Operations Agent: Vultr Inference (Llama 3)]
     C -->|Synthesis| F[Decision: BUY/SELL/HOLD]
     F -->|Execution| G[Kraken CLI: xStocks Layer]
     G --> H[Vantage Portfolio Dashboard]
     D -.->|Compliance Audit| C
     E -.->|Volatility Check| C
+    I -.->|Operational Metrics| C
 ```
 
 ### 🧠 Open-Source LLM Integration (via Featherless)
@@ -29,6 +31,7 @@ To meet the challenge of "realistic future-of-work use cases," we leverage speci
 
 - **DeepSeek-V3**: Powers the **General Counsel** for strict logical auditing and compliance verification.
 - **Qwen-2.5-72B**: Powers the **Macro Strategist**, providing deep contextual reasoning on market volatility.
+- **Llama 3 8B (via Vultr Serverless Inference)**: Powers the **Operations Agent**, demonstrating seamless multi-cloud LLM orchestration.
 
 ---
 
@@ -60,7 +63,7 @@ Ingests real-world enterprise documents (Invoices, Tax Forms) using **Gemini 1.5
 
 ## 🛠 Tech Stack
 
-- **AI**: Gemini 1.5 Flash, DeepSeek-V3, Qwen-2.5-72B.
+- **AI**: Gemini 1.5 Flash, DeepSeek-V3, Qwen-2.5-72B, Llama 3 8B (Vultr Inference).
 - **Backend**: FastAPI, MongoDB, Kraken CLI v0.3.2.
 - **Frontend**: React (Vite), TypeScript, Nginx.
 - **Infrastructure**: Docker, Docker Compose, Vultr Cloud.

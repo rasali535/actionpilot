@@ -62,17 +62,39 @@ const Boardroom = () => {
             No active deliberations in the boardroom. Scanning markets...
           </div>
         )}
-        {deliberations.map((d: any, idx) => (
-          <div key={idx} className="glass card" style={{ padding: '1.5rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <div style={{ fontWeight: 700, color: 'var(--primary)' }}>Symbol: {d.symbol}</div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{new Date(d.timestamp).toLocaleString()}</div>
+        {deliberations.map((d: any, idx) => {
+          const actionColor = d.action === 'BUY' ? 'var(--success)' : d.action === 'SELL' ? 'var(--danger)' : 'var(--vantage-gold)';
+          return (
+            <div key={idx} className="glass card" style={{ padding: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <span style={{ fontWeight: 700, color: 'var(--primary)', fontSize: '1rem' }}>{d.pair || d.symbol || 'N/A'}</span>
+                  <span style={{
+                    background: actionColor,
+                    color: '#000',
+                    fontWeight: 800,
+                    fontSize: '0.75rem',
+                    padding: '0.2rem 0.75rem',
+                    borderRadius: '999px',
+                    letterSpacing: '0.05em'
+                  }}>{d.action || '—'}</span>
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{new Date(d.timestamp).toLocaleString()}</div>
+              </div>
+              <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: '1rem' }}>
+                {d.reasoning || d.deliberation || 'No reasoning provided.'}
+              </div>
+              <div style={{ display: 'flex', gap: '2rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                {d.risk_score !== undefined && (
+                  <div>Risk Score: <span style={{ color: d.risk_score > 70 ? 'var(--danger)' : 'var(--success)', fontWeight: 700 }}>{d.risk_score}/100</span></div>
+                )}
+                {d.confidence !== undefined && (
+                  <div>Confidence: <span style={{ color: 'var(--primary)', fontWeight: 700 }}>{(d.confidence * 100).toFixed(0)}%</span></div>
+                )}
+              </div>
             </div>
-            <div style={{ whiteSpace: 'pre-wrap', fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-              {d.deliberation}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

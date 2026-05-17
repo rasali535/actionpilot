@@ -14,11 +14,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Final stage
 FROM python:3.14-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # Copy Python site-packages and bin from builder
 COPY --from=builder /usr/local/lib/python3.14/site-packages /usr/local/lib/python3.14/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
+
+# Install kraken CLI
+RUN curl --proto '=https' --tlsv1.2 -LsSf https://github.com/krakenfx/kraken-cli/releases/latest/download/kraken-cli-installer.sh | sh
+ENV PATH="/root/.cargo/bin:${PATH}"
 
 WORKDIR /app
 COPY . .

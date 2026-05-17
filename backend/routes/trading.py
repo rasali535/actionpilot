@@ -242,4 +242,4 @@ async def process_invoice():
         await db.trading_ledger.insert_one(trade_entry)
     trades_history.insert(0, trade_entry)
         
-    return {"status": "success", "extraction": extraction}
+    return {"status": "success", "extraction": extraction, "meeting_id": trade_entry["order_id"]}

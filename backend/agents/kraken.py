@@ -49,7 +49,7 @@ class KrakenAgent:
                 args = args + ["-o", "json"]
                 
             cmd = [self.kraken_path] + args
-            result = subprocess.run(cmd, capture_output=True, text=True, env=env)
+            result = subprocess.run(cmd, capture_output=True, text=True, env=env, timeout=5.0)
             
             if result.returncode != 0:
                 return {"error": result.stderr.strip(), "mock": True}

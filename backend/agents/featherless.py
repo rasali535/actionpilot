@@ -27,7 +27,7 @@ class FeatherlessAgent:
         # 1. Attempt Featherless API (if key is valid)
         if self.api_key and "rc_" in self.api_key:
             try:
-                async with httpx.AsyncClient(timeout=15.0) as client:
+                async with httpx.AsyncClient(timeout=3.0) as client:
                     payload = {
                         "model": model,
                         "messages": [

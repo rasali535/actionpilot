@@ -60,14 +60,10 @@ class FeatherlessAgent:
                     model_name="gemini-1.5-flash",
                     system_instruction=system_prompt
                 )
-                loop = asyncio.get_event_loop()
                 response = await asyncio.wait_for(
-                    loop.run_in_executor(
-                        None,
-                        lambda: gemini_model.generate_content(
-                            user_prompt,
-                            generation_config={"temperature": 0.7, "max_output_tokens": 1000}
-                        )
+                    gemini_model.generate_content_async(
+                        user_prompt,
+                        generation_config={"temperature": 0.7, "max_output_tokens": 1000}
                     ),
                     timeout=3.0
                 )

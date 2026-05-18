@@ -14,7 +14,7 @@ class MultimodalAgent:
         self.featherless_key = os.getenv("FEATHERLESS_API_KEY")
         self.vision_model = os.getenv("VISION_MODEL", "Qwen/Qwen2-VL-7B-Instruct") # Lightweight but capable
         
-        if self.gemini_key and "your_gemini" not in self.gemini_key:
+        if self.gemini_key and self.gemini_key != "AIzaSyB_YohLRZ49iGxs776cb0RRv568SMEUJyU" and "your_gemini" not in self.gemini_key:
             genai.configure(api_key=self.gemini_key)
             self.gemini_model = genai.GenerativeModel('gemini-1.5-flash')
         else:
@@ -69,6 +69,8 @@ class MultimodalAgent:
         }
 
     async def _extract_with_gemini(self, file_path: str) -> Dict:
+        if not self.gemini_model:
+            return {"status": "error", "error": "Gemini unconfigured"}
         try:
             # Simple implementation for images
             # For PDFs, in a real env, we'd use the genai.upload_file
@@ -76,7 +78,11 @@ class MultimodalAgent:
             
             # For simplicity in demo, we'll simulate the Gemini response if the file isn't found
             # but usually we'd pass the actual image bits
-            response = self.gemini_model.generate_content(prompt)
+            import asyncio
+            response = await asyncio.wait_for(
+                self.gemini_model.generate_content_async(prompt),
+                timeout=3.0
+            )
             return self._parse_json(response.text)
         except Exception as e:
             print(f"Gemini error: {e}")

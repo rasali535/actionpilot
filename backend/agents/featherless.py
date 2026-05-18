@@ -52,7 +52,7 @@ class FeatherlessAgent:
 
         # 2. Attempt Google Gemini Fallback
         gemini_key = os.getenv("GEMINI_API_KEY")
-        if gemini_key and "your_gemini" not in gemini_key:
+        if gemini_key and gemini_key != "AIzaSyB_YohLRZ49iGxs776cb0RRv568SMEUJyU" and "your_gemini" not in gemini_key:
             try:
                 import google.generativeai as genai
                 genai.configure(api_key=gemini_key)
@@ -61,12 +61,15 @@ class FeatherlessAgent:
                     system_instruction=system_prompt
                 )
                 loop = asyncio.get_event_loop()
-                response = await loop.run_in_executor(
-                    None,
-                    lambda: gemini_model.generate_content(
-                        user_prompt,
-                        generation_config={"temperature": 0.7, "max_output_tokens": 1000}
-                    )
+                response = await asyncio.wait_for(
+                    loop.run_in_executor(
+                        None,
+                        lambda: gemini_model.generate_content(
+                            user_prompt,
+                            generation_config={"temperature": 0.7, "max_output_tokens": 1000}
+                        )
+                    ),
+                    timeout=3.0
                 )
                 if response and response.text:
                     return response.text

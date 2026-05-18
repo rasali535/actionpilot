@@ -1,105 +1,78 @@
 # 🌌 Vantage-Point 2.0: Autonomous Enterprise Treasury Engine
 
-**Vantage-Point 2.0** is a state-of-the-art, AI-native autonomous corporate treasury engine built for the **AI Agent Olympics Hackathon**. It directly solves the **$1.2 Trillion SMB Cash Drag** by transforming idle corporate capital into yield-bearing assets through an agentic boardroom council orchestration and real-time execution.
+**Vantage-Point 2.0** is a state-of-the-art, AI-native autonomous corporate treasury rebalancing engine built for the **AI Agent Olympics Hackathon**. It directly solves the **$1.2 Trillion SMB Cash Drag** by transforming idle corporate capital into yield-bearing assets through real-time mathematical **Anti-Whipsaw Filters**, high-conviction **Multi-Agent Boardroom Deliberation**, and robust Vultr VM orchestration.
 
 🟢 **Live Production Link (Vultr-Hosted):** [http://216.128.155.55](http://216.128.155.55)  
-🟢 **Frontend Portal (Vercel Proxy):** [https://actionpilot-six.vercel.app](https://actionpilot-six.vercel.app)
+🟢 **Vite Frontend Dashboard (Nginx):** [http://216.128.155.55](http://216.128.155.55)  
+🟢 **FastAPI Gateway (Port 8000):** [http://216.128.155.55:8000](http://216.128.155.55:8000)
 
 ---
 
 ## 🏛️ Comprehensive Architecture Deep-Dive
 
-Vantage-Point 2.0 implements a **Collaborative Agentic System** that moves beyond simple copilots into a high-trust, resilient, multi-agent boardroom council. It manages corporate float, audits decisions for strict regulatory compliance, assesses macro risk, and programmatically executes trades.
+Vantage-Point 2.0 implements a **Collaborative Agentic System** that moves beyond simple copilots into a high-trust, resilient, multi-agent boardroom council. It manages corporate float, filters noisy signals, audits decisions for strict regulatory compliance, assesses macro risk, and programmatically executes trades on Vultr VM nodes.
 
 ### 🔄 End-to-End System Data Flow
 
 ```mermaid
-flowchart TB
-    %% Inputs
-    subgraph Ingestion ["1. Multimodal & Voice Ingestion Layer"]
-        A1[🎙️ Executive Voice Memos] -->|Real-Time Audio Stream| B1[🎙️ Speechmatics API]
-        A2[📄 Invoices & Business PDF Reports] -->|Document Ingestion| B2[🧠 Gemini 1.5 Flash Multimodal]
-    end
-
-    %% Backend Gateway
-    subgraph CoreBackend ["2. FastAPI Core Engine (Hosted on Vultr VM)"]
-        C1[⚙️ Ingestion Router] -->|Parse & Normalize| D1[💾 MongoDB Event Store]
-        B1 -->|Real-Time JSON Transcript| C1
-        B2 -->|Extracted Financial Struct| C1
-    end
-
-    %% Boardroom Deliberation
-    subgraph Boardroom ["3. Agentic Boardroom Council Deliberation"]
-        E1[🦁 Council President & Synthesizer: Gemini 1.5 Pro]
-        E2[⚖️ General Counsel: DeepSeek-V3 via Featherless]
-        E3[📉 Risk Officer: Qwen-2.5-72B via Featherless]
-        E4[⚙️ Operations Officer: Llama-3.1-70B via Vultr Inference]
-        
-        D1 -->|Trigger Council Deliberation| E1
-        E1 <-->|Concurrent Prompt Routing| E2
-        E1 <-->|Concurrent Prompt Routing| E3
-        E1 <-->|Concurrent Prompt Routing| E4
-        
-        E1 -->|Glass-Box Consensus Synthesis| F1{Execute Action?}
-    end
-
-    %% Execution
-    subgraph Execution ["4. High-Trust Execution & Audit Layer"]
-        F1 -->|Yes: Approved| G1[🐙 Kraken CLI Executor]
-        F1 -->|No: Rejected/Hold| G2[📝 Compliance Audit Logger]
-        
-        G1 -->|Place Market Order on AAPLx/USD| H1[📈 Kraken xStocks Layer]
-        H1 -->|Transaction Receipts| I1[💾 MongoDB Audit Ledger]
-        G2 -->|Detailed Refusal Reasoning| I1
-    end
-
-    %% Client Layer
-    subgraph UserInterface ["5. Real-Time Observability UI"]
-        J1[🎨 Vite + TypeScript Executive Portal] <-->|Vercel Reverse Proxy API| CoreBackend
-        I1 -->|WebSockets/SSE| J1
-    end
-
-    style Ingestion fill:#1e1e38,stroke:#5c5cfc,stroke-width:2px,color:#fff
-    style CoreBackend fill:#112233,stroke:#00aaff,stroke-width:2px,color:#fff
-    style Boardroom fill:#1b1b22,stroke:#ffaa00,stroke-width:2px,color:#fff
-    style Execution fill:#221111,stroke:#ff3333,stroke-width:2px,color:#fff
-    style UserInterface fill:#112211,stroke:#33cc33,stroke-width:2px,color:#fff
+graph TD
+    A[Incoming Live Market Signal] --> B[Kaufman Efficiency Ratio Filter]
+    B -->|ER < 0.3: High Noise| C[Automatic Cooldown Lock / FORCE_HOLD]
+    B -->|ER >= 0.3: Strong Signal| D[Calculate Signal Quality Index SQI]
+    C --> E[Multi-Agent Boardroom Deliberation]
+    D --> E
+    E --> F[General Counsel Audit: DeepSeek-V3.2]
+    E --> G[Macro Strategist Trends: Qwen 2.5-72B]
+    F --> H[CEO Deliberation & Synthesis]
+    G --> H
+    H --> I{CEO Proposed Action}
+    I -->|HOLD| J[Protect Treasury Capital]
+    I -->|BUY / SELL| K[Verify Cooldown & Friction Locks]
+    K -->|Pass| L[Execute Trade via Kraken CLI]
+    K -->|Fail: High Volatility| J
 ```
 
 ---
 
-## 🧠 The Agentic Boardroom Council
+## 🧮 Mathematical Anti-Whipsaw Filter Layer
+
+Most automated treasury engines fail because they act on **noisy market signals**, leading to excessive whipsaw trades, transaction friction, slippage, and capital erosion. Vantage-Point 2.0 introduces a state-of-the-art mathematical pre-filtering layer that executes prior to AI deliberation:
+
+### 1. Kaufman's Efficiency Ratio (ER)
+The system calculates Kaufman's Efficiency Ratio over historical OHLC intervals to quantify price directionality vs. underlying market noise:
+$$\text{ER} = \frac{|\text{Price}_t - \text{Price}_{t-n}|}{\sum_{i=0}^{n} |\text{Price}_{t-i} - \text{Price}_{t-i-1}|}$$
+
+* **ER < 0.3 (Noisy / Choppy Regime)**: The market is in a random walk. The engine automatically locks the system in `FORCE_HOLD` mode, overriding bullish or bearish AI signals to prevent capital decay.
+* **ER >= 0.3 (Trending Regime)**: The signal exhibits high directionality. The engine computes a **Signal Quality Index (SQI)** and allows the boardroom deliberation to proceed.
+
+### 2. Average True Range (ATR) Volatility Scaling
+Real-time volatility is calculated using the Average True Range (ATR) as a percentage of the asset price. If the volatility exceeds historical thresholds, trade volume is scaled down or trade locks are engaged to insulate the company float from excessive market swings.
+
+### 3. CPU Offload Thread Pools
+To prevent heavy mathematical array calculations from blocking the primary asynchronous FastAPI event loop, all pre-filter calculations are executed on isolated, CPU-optimized background thread pools.
+
+---
+
+## 🏛️ The Agentic Boardroom Council
 
 To guarantee enterprise-grade safety, Vantage-Point employs four highly specialized, autonomous agents that coordinate concurrently:
 
 | Role | Agent Persona | Model Stack | Delivery Channel | Responsibility |
 | :--- | :--- | :--- | :--- | :--- |
 | **🦁 President & CEO** | Executive Decision Maker | `gemini-1.5-pro` / `gemini-1.5-flash` | Google AI Studio | Aggregates all council feedback, performs advanced contextual synthesis, resolves conflicts, and generates the final structured execution payload. |
-| **⚖️ General Counsel** | Compliance & Legal Audit | `deepseek-ai/DeepSeek-V3` | Featherless API | Audits the trade against active enterprise risk rules, checks compliance against corporate policies, and flags regulatory roadblocks. |
+| **⚖️ General Counsel** | Compliance & Legal Audit | `deepseek-ai/DeepSeek-V3.2` | Featherless API | Audits the trade against active enterprise risk rules, checks compliance against corporate policies, and flags regulatory roadblocks. |
 | **📉 Risk Officer** | Macro Volatility & Risk Analyst | `Qwen/Qwen2.5-72B-Instruct` | Featherless API | Computes market volatility, calculates max drawdown tolerances, and verifies trade sizes against current treasury float. |
 | **⚙️ Operations Officer** | Infrastructure & Cloud Systems | `llama-3.1-70b-instruct-fp8` | **Vultr Serverless Inference** | Assesses operational network status, verifies connection latency, confirms execution node health, and ensures maximum system uptime. |
 
-### 🤝 The Consensus Consensus Algorithm
+---
 
-When an ingestion event occurs:
-1. The **FastAPI Backend Router** concurrently distributes the event context to the **General Counsel**, **Risk Officer**, and **Operations Officer**.
-2. Each specialized agent executes its contextual prompt structure and returns a dedicated reasoning payload.
-3. The **CEO Agent** ingests the raw transcripts of the three agents, performs cross-reasoning analysis, and outputs a strict JSON structure:
-   ```json
-   {
-     "decision": "BUY" | "SELL" | "HOLD",
-     "symbol": "AAPLx/USD",
-     "volume": 0.01,
-     "consensus_score": 0.92,
-     "glass_box_reasoning": "...",
-     "individual_agent_votes": {
-       "general_counsel": "APPROVED",
-       "risk_officer": "APPROVED",
-       "operations_officer": "APPROVED"
-     }
-   }
-   ```
-4. If a single agent raises a high-severity regulatory or operational warning, the **CEO Agent** halts execution and logs the comprehensive reasoning trail for human-in-the-loop review.
+## 🛡️ High-Availability & Safety Systems
+
+Vantage-Point 2.0 is architected with a **Zero-Trust Resilience** approach to API and system operations:
+
+* **3.0s Gateway Timeout Failover**: Low-latency timeouts are applied to the Featherless gateway. If server queuing causes AI model latency, the client immediately fails over to local fallback heuristics and Google Gemini backups, bypassing queuing hangs.
+* **8.0s Route Circuit-Breaker**: The `/api/trading/scan` route is wrapped in an `asyncio.wait_for` wrapper. If any external endpoint (Kraken CLI, AI API, or DB socket) hangs, the system automatically returns a graceful `[SAFETY FALLBACK] HOLD` response in **less than 8 seconds**, guaranteeing 100% API availability.
+* **Resilient MongoDB Operations**: All database write operations (`insert_one`, `find`) are isolated in robust try-except layers. A temporary database connection drift or slow collection lock will never crash or block the primary trade scanning threads.
 
 ---
 
@@ -109,27 +82,22 @@ Vantage-Point 2.0 is specifically designed to unite all five sponsor technologie
 
 ### 1. ☁️ Vultr (High-Performance Cloud Infrastructure & Serverless Inference)
 * **Production Hosting**: The FastAPI backend, React web portal (via Dockerized Nginx), and high-performance MongoDB instance are hosted in a secure, unified Docker virtual network on a Vultr VM.
-* **Serverless Inference Integration**: The **Operations Officer** agent communicates directly with Vultr's Serverless Inference endpoint (`https://api.vultrinference.com/v1`) using the optimized `llama-3.1-70b-instruct-fp8` model.
-* **Strict Network Security**: Fully hardened via Vultr's **API Access Control IP Whitelisting** (`216.128.155.55/32` CIDR subnet), restricting communication strictly to authenticated host endpoints.
+* **Serverless Inference Integration**: The **Operations Officer** agent communicates directly with Vultr's Serverless Inference endpoint using the optimized `llama-3.1-70b-instruct-fp8` model.
+* **Strict Network Security**: Fully hardened via Vultr's **API Access Control IP Whitelisting** (`216.128.155.55/32` CIDR subnet).
 
 ### 2. 🧠 Google Gemini (Advanced Reasoning & Multimodal Context)
 * **Orchestration & CEO**: Utilizes `gemini-1.5-pro`'s massive context window to synthesize extensive boardroom transcripts and cross-examine reasoning.
-* **Multimodal Invoice Processing**: Ingests physical paper invoices, PDF reports, and spreadsheets directly via image embedding. Exposes visual and semantic context to the boardroom to identify billing spikes or early-payment discount opportunities.
+* **Multimodal Invoice Processing**: Ingests physical paper invoices, PDF reports, and spreadsheets directly via image embedding, identifying billing spikes or early-payment discount opportunities.
 
 ### 3. 🐙 Kraken (Programmatic Tokenized Stock Execution - xStocks)
 * **Execution Gateway**: Communicates with the `kraken` trading CLI installed on the Vultr host container.
 * **xStocks Focus**: Autonomously trades tokenized real-world equities (specifically `AAPLx/USD` tokenized Apple shares) to harvest corporate yield from idle company capital without leaving the blockchain layer.
-* **Programmatic Order Routing**: Features defensive checks for order depth, minimum lot sizes, and slippage tolerance before piping arguments to the Kraken CLI.
 
 ### 4. 🪶 Featherless (Decentralized Open-Source Model Deployment)
-* **Enterprise Specialty Agents**: Connects directly to the Featherless API to call highly advanced, open-source models:
-  * `deepseek-ai/DeepSeek-V3` for deep legal and logical compliance verification.
-  * `Qwen/Qwen2.5-72B-Instruct` for quantitative risk analysis.
-* **High-Throughput Parallel Processing**: Leverages Featherless' serverless infrastructure to query both models concurrently, maintaining an ultra-low execution latency profile.
+* **Enterprise Specialty Agents**: Connects directly to the Featherless API to call highly advanced, open-source models (`deepseek-ai/DeepSeek-V3.2` and `Qwen/Qwen2.5-72B-Instruct`) for compliance and quantitative risk analysis.
 
 ### 5. 🎙️ Speechmatics (Voice-First Enterprise Ingestion)
-* **Real-time Audio Stream**: Captures executive speech or voice commands directly from the dashboard mic.
-* **Precision Transcription**: Speechmatics transcribes unstructured audio in real-time, mapping voice notes into a structured "Float Event" to trigger boardroom deliberations autonomously.
+* **Real-time Audio Stream**: Captures executive speech or voice commands directly from the dashboard mic and transcribes unstructured audio in real-time, triggering autonomous boardroom deliberations.
 
 ---
 
@@ -137,19 +105,23 @@ Vantage-Point 2.0 is specifically designed to unite all five sponsor technologie
 
 Vantage-Point 2.0 utilizes **MongoDB** to record every step of the decision pipeline for strict SOX compliance. 
 
-### 1. `meetings` Collection
-Tracks visual/voice boardroom syncs:
+### 1. `boardroom_history` Collection
+Tracks visual/voice boardroom deliberations:
 ```json
 {
   "_id": "ObjectId",
-  "title": "Quarterly Liquidity Sync",
-  "date": "2026-05-17",
-  "status": "processed",
-  "voice_transcript": "..."
+  "pair": "AAPL/USD",
+  "action": "HOLD",
+  "reasoning": "[WHIPSAW PROTECT ACTIVE] Downgraded BUY to HOLD. High market noise detected.",
+  "confidence": 1.0,
+  "risk_score": 15,
+  "timestamp": "2026-05-18T10:44:22Z",
+  "signal_quality": 15.0,
+  "whipsaw_risk": "HIGH"
 }
 ```
 
-### 2. `trades` Collection
+### 2. `trading_ledger` Collection
 Maintains an immutable record of autonomous trades:
 ```json
 {
@@ -161,13 +133,20 @@ Maintains an immutable record of autonomous trades:
   "price": 175.42,
   "timestamp": "2026-05-17T11:23:07Z",
   "status": "filled",
-  "reasoning": "Macro treasury optimization triggered by Qwen risk models.",
-  "consensus_votes": {
-    "ceo": "BUY",
-    "general_counsel": "APPROVE",
-    "risk_officer": "APPROVE",
-    "operations_officer": "APPROVE"
-  }
+  "reasoning": "Macro treasury optimization triggered by Qwen risk models."
+}
+```
+
+### 3. `audit_logs` Collection
+Tracks detailed system operation logs:
+```json
+{
+  "_id": "ObjectId",
+  "timestamp": "2026-05-18T10:44:22Z",
+  "agent": "Boardroom CEO",
+  "action": "Autonomous HOLD",
+  "reasoning": "Market consolidation zone. Kaufman ER: 0.25 (Random Walk Regime).",
+  "status": "success"
 }
 ```
 
@@ -198,7 +177,7 @@ This script automatically provisions Docker, pulls the codebase, configures Ngin
    FEATHERLESS_API_KEY=your_featherless_key
    VULTR_INFERENCE_API_KEY=your_vultr_inference_key
    SPEECHMATICS_API_KEY=your_speechmatics_key
-   MONGODB_URL=mongodb+srv://...
+   MONGODB_URL=mongodb://mongodb:27017/actionpilot
    
    # Trading
    KRAKEN_API_KEY=your_kraken_key
@@ -216,12 +195,6 @@ The React portal features an ultra-premium **glassmorphism user interface** opti
 * **Real-time Deliberation Terminal**: Live visualization of the boardroom agents actively voting and cross-examining arguments.
 * **Voice-Trigger Module**: Instantly submit live audio messages processed by Speechmatics.
 * **Portfolio Visualizer**: Track holdings in `AAPLx/USD` tokenized stock, complete with real-time profit and loss (P&L) tracking and live transaction history.
-
----
-
-### 🛡️ Compliance & Safety first
-> [!IMPORTANT]
-> Vantage-Point 2.0 incorporates strict safety controls. Every agent has a dedicated fallback engine. If an LLM endpoint fails, the systems gracefully fall back to highly conservative mock-data engines and alert the treasury officer, preventing random execution state issues or 500 API responses.
 
 ***
 

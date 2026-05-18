@@ -38,7 +38,7 @@ class KrakenAgent:
         except Exception:
             return ""
 
-    def _run(self, args: List[str]) -> Dict:
+    async def _run(self, args: List[str]) -> Dict:
         try:
             env = os.environ.copy()
             if self.api_key: env["KRAKEN_API_KEY"] = self.api_key
@@ -49,7 +49,15 @@ class KrakenAgent:
                 args = args + ["-o", "json"]
                 
             cmd = [self.kraken_path] + args
-            result = subprocess.run(cmd, capture_output=True, text=True, env=env, timeout=5.0)
+            # Run in a background thread to prevent blocking the async event loop
+            result = await asyncio.to_thread(
+                subprocess.run,
+                cmd,
+                capture_output=True,
+                text=True,
+                env=env,
+                timeout=3.0
+            )
             
             if result.returncode != 0:
                 return {"error": result.stderr.strip(), "mock": True}
@@ -64,7 +72,7 @@ class KrakenAgent:
         if "x/" in pair or self.asset_class == "tokenized_asset":
             args.extend(["--asset-class", "tokenized_asset"])
             
-        res = self._run(args)
+        res = await self._run(args)
         if res.get("mock"):
             import random
             price = round(random.uniform(170, 230), 2)
@@ -91,7 +99,7 @@ class KrakenAgent:
         }
 
     async def get_ohlc(self, pair: str, interval: int = 60) -> List[Dict]:
-        res = self._run(["ohlc", pair, "--interval", str(interval)])
+        res = await self._run(["ohlc", pair, "--interval", str(interval)])
         if res.get("mock"):
             import time
             import random
@@ -118,12 +126,12 @@ class KrakenAgent:
         ]
 
     async def get_paper_status(self) -> Dict:
-        res = self._run(["paper", "status"])
+        res = await self._run(["paper", "status"])
         if res.get("mock") and "not initialized" in res.get("error", "").lower():
             # Auto-initialize paper account programmatically if it got wiped out
-            init_res = self._run(["paper", "init", "--balance", "100000", "--currency", "USD", "--yes"])
+            init_res = await self._run(["paper", "init", "--balance", "100000", "--currency", "USD", "--yes"])
             if not init_res.get("mock"):
-                res = self._run(["paper", "status"])
+                res = await self._run(["paper", "status"])
                 
         if res.get("mock"):
             if self.invoice_expenses > 0:
@@ -148,13 +156,13 @@ class KrakenAgent:
     async def execute_trade(self, symbol: str, side: str, volume: float) -> Dict:
         """Executes a paper trade for the demo"""
         pair = symbol if "/" in symbol else f"{symbol}/USD"
-        res = self._run(["paper", side.lower(), pair, str(volume), "--yes"])
+        res = await self._run(["paper", side.lower(), pair, str(volume), "--yes"])
         
         if res.get("mock") and "not initialized" in res.get("error", "").lower():
             # Auto-initialize paper account programmatically and retry
-            init_res = self._run(["paper", "init", "--balance", "100000", "--currency", "USD", "--yes"])
+            init_res = await self._run(["paper", "init", "--balance", "100000", "--currency", "USD", "--yes"])
             if not init_res.get("mock"):
-                res = self._run(["paper", side.lower(), pair, str(volume), "--yes"])
+                res = await self._run(["paper", side.lower(), pair, str(volume), "--yes"])
                 
         if res.get("mock"):
             # Update mock balance in-memory to simulate balance changes for invalid pairs (stocks)

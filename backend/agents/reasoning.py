@@ -30,12 +30,25 @@ class BoardroomCouncil:
             user_prompt=f"Ticker: {json.dumps(ticker)}"
         )
 
-    async def deliberate(self, ticker: Dict, ohlc: List, pair: str) -> Dict:
+    async def deliberate(self, ticker: Dict, ohlc: List, pair: str, whipsaw_report: Dict = None) -> Dict:
         """The Boardroom Council Deliberation Workflow via Featherless"""
-        market_summary = f"Pair: {pair}, Last: {ticker.get('last')}, 24h Change: {ticker.get('change_percent')}%"
+        whipsaw_context = ""
+        if whipsaw_report:
+            whipsaw_context = f"""
+        [SIGNAL QUALITY & ANTI-WHIPSAW REPORT]:
+        - Kaufman's Efficiency Ratio (ER): {whipsaw_report.get('efficiency_ratio')} ({whipsaw_report.get('regime')})
+        - Volatility (ATR): {whipsaw_report.get('atr')} ({whipsaw_report.get('pct_volatility')}% of price)
+        - Whipsaw Risk Level: {whipsaw_report.get('whipsaw_risk')}
+        - Anti-Whipsaw Recommendation: {whipsaw_report.get('action_recommendation')}
+        - System Audit Details: {whipsaw_report.get('reason')}
+            """
+
+        market_summary = f"Pair: {pair}, Last: {ticker.get('last')}, 24h Change: {ticker.get('change_percent')}%."
+        if whipsaw_report:
+            market_summary += f" Whipsaw Risk: {whipsaw_report.get('whipsaw_risk')}. Efficiency Ratio: {whipsaw_report.get('efficiency_ratio')}."
         
         # 1. Parallel Research (Featherless)
-        gc_task = self.get_gc_opinion(market_summary)
+        gc_task = self.get_gc_opinion(market_summary + f" System Recommendation: {whipsaw_report.get('action_recommendation') if whipsaw_report else 'PROCEED'}")
         macro_task = self.get_macro_opinion(ticker)
         
         gc_view, macro_view = await asyncio.gather(gc_task, macro_task)
@@ -46,13 +59,20 @@ class BoardroomCouncil:
         
         [General Counsel Opinion]: {gc_view}
         [Macro Strategist Opinion]: {macro_view}
+        {whipsaw_context}
         [Market Data]: {json.dumps(ohlc[:5])}
         
         As CEO, synthesize these views and make a final trade decision.
+        
+        CRITICAL REBALANCING RULES:
+        1. If the Anti-Whipsaw recommendation is FORCE_HOLD or ADVISE_HOLD, you should strongly favor a "HOLD" action to protect treasury capital from high transaction friction and slippage.
+        2. Pay close attention to Kaufman's Efficiency Ratio (ER). If ER < 0.3, the market is in a noisy, whipsaw-prone random walk; you should HOLD unless a high-conviction macro event mandates action.
+        3. Explain how signal quality (ER) and volatility (ATR) influenced your final decision in the "reasoning" field.
+
         Return ONLY valid JSON:
         {{
             "action": "BUY" | "SELL" | "HOLD",
-            "reasoning": "A concise synthesis of the boardroom's debate",
+            "reasoning": "A concise synthesis of the boardroom's debate, explicitly mentioning how signal quality/ER and whipsaw risk affected your decision.",
             "risk_score": 0-100,
             "confidence": 0-1.0
         }}
@@ -76,9 +96,10 @@ class BoardroomCouncil:
             # Fallback for parsing errors
             return {
                 "action": "HOLD",
-                "reasoning": "Synthesis failed, defaulting to neutral state for safety.",
+                "reasoning": "Synthesis failed or JSON was invalid, defaulting to HOLD for safety.",
                 "risk_score": 50,
                 "confidence": 0.5
             }
 
 boardroom = BoardroomCouncil()
+

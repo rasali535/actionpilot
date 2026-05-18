@@ -4,6 +4,7 @@ from typing import List, Dict
 from agents.kraken import KrakenAgent
 from agents.reasoning import boardroom
 from agents.multimodal import multimodal_agent
+from agents.whipsaw_protection import whipsaw_protection
 import asyncio
 from datetime import datetime
 from database import get_database
@@ -150,7 +151,7 @@ async def get_boardroom_history():
 
 @router.post("/scan")
 async def scan_and_trade():
-    """Vantage-Point 2.0: Multi-Agent Boardroom Loop"""
+    """Vantage-Point 2.0: Multi-Agent Boardroom Loop with Anti-Whipsaw Protection"""
     k_agent = get_kraken_agent()
     db = await get_database()
     
@@ -164,9 +165,39 @@ async def scan_and_trade():
         k_agent.get_paper_status()
     )
     
-    # 2. Boardroom Deliberation
-    decision = await boardroom.deliberate(ticker, ohlc, trading_pair)
-    delib_entry = {**decision, "timestamp": datetime.now().isoformat(), "pair": trading_pair}
+    # Fetch recent ledger history for cooldown checks
+    recent_history = trades_history
+    if db is not None:
+        try:
+            db_history = await db.trading_ledger.find().sort("timestamp", -1).limit(10).to_list(length=10)
+            if db_history:
+                recent_history = db_history
+        except:
+            pass
+
+    # 1b. Run Anti-Whipsaw Filter Audit before deliberation
+    whipsaw_report = whipsaw_protection.evaluate_signal_quality(ohlc, recent_history, "HOLD")
+    
+    # 2. Boardroom Deliberation (incorporating the whipsaw and signal quality context)
+    decision = await boardroom.deliberate(ticker, ohlc, trading_pair, whipsaw_report)
+    
+    # 2b. Re-evaluate and enforce hard cooldown lock / whipsaw lock post-deliberation
+    proposed_action = decision.get("action", "HOLD")
+    whipsaw_report_final = whipsaw_protection.evaluate_signal_quality(ohlc, recent_history, proposed_action)
+    
+    if whipsaw_report_final.get("action_recommendation") == "FORCE_HOLD" and proposed_action != "HOLD":
+        decision["action"] = "HOLD"
+        decision["reasoning"] = f"[WHIPSAW PROTECT ACTIVE] Downgraded {proposed_action} to HOLD. {whipsaw_report_final.get('reason')}"
+        decision["risk_score"] = int(whipsaw_report_final.get("signal_quality_index", 10.0))
+        decision["confidence"] = 1.0
+        
+    delib_entry = {
+        **decision, 
+        "timestamp": datetime.now().isoformat(), 
+        "pair": trading_pair,
+        "signal_quality": whipsaw_report_final.get("signal_quality_index"),
+        "whipsaw_risk": whipsaw_report_final.get("whipsaw_risk")
+    }
     deliberation_history.insert(0, delib_entry)
     if db is not None:
         try:
@@ -174,12 +205,12 @@ async def scan_and_trade():
         except Exception as e:
             print(f"Error inserting boardroom history to DB: {e}")
     
-    # 3. Audit Log Entry
+    # 3. Audit Log Entry (Include signal quality metrics in public audit trails)
     audit_entry = {
         "timestamp": datetime.now().isoformat(),
         "agent": "Boardroom CEO",
         "action": f"Autonomous {decision.get('action')}",
-        "reasoning": decision.get("reasoning"),
+        "reasoning": f"{decision.get('reasoning')} | Signal Quality Index: {whipsaw_report_final.get('signal_quality_index')}% (Risk: {whipsaw_report_final.get('whipsaw_risk')})",
         "status": "success"
     }
     if db is not None:
@@ -210,7 +241,8 @@ async def scan_and_trade():
     return {
         "pair": trading_pair,
         "decision": decision,
-        "trade": trade_res
+        "trade": trade_res,
+        "signal_quality_report": whipsaw_report_final
     }
 
 @router.post("/manual")

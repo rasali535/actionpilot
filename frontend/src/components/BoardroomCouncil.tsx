@@ -6,6 +6,8 @@ interface CouncilProps {
     reasoning: string;
     risk_score: number;
     confidence: number;
+    signal_quality?: number;
+    whipsaw_risk?: string;
   };
   scanning?: boolean;
 }
@@ -82,6 +84,14 @@ const BoardroomCouncil = ({ decision, scanning }: CouncilProps) => {
     </div>
   );
 
+  // Helper color logic for Signal Quality Index (SQI)
+  const getSQIColor = (sqi?: number) => {
+    if (!sqi) return '#10b981';
+    if (sqi >= 60) return '#10b981'; // Success Green
+    if (sqi >= 30) return '#f59e0b'; // Warning Orange
+    return '#ef4444'; // Danger Red
+  };
+
   return (
     <div className="glass card">
       <h3 style={{ marginBottom: '1.5rem' }}>The Boardroom Consensus</h3>
@@ -119,8 +129,38 @@ const BoardroomCouncil = ({ decision, scanning }: CouncilProps) => {
           </div>
         </div>
 
+        {/* Dynamic Whipsaw Gating and Signal Quality Metrics */}
+        {decision.signal_quality !== undefined && (
+          <div style={{ 
+            padding: '1rem', 
+            background: 'rgba(255, 255, 255, 0.02)', 
+            borderRadius: '8px', 
+            border: '1px solid rgba(255, 255, 255, 0.05)',
+            marginTop: '0.5rem'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.5rem', fontWeight: 600 }}>
+              <span style={{ color: 'var(--text-muted)' }}>Kaufman Signal Quality (SQI)</span>
+              <span style={{ color: getSQIColor(decision.signal_quality) }}>
+                {decision.signal_quality}% ({decision.whipsaw_risk} WHIPSAW RISK)
+              </span>
+            </div>
+            <div style={{ width: '100%', height: '4px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '2px', marginBottom: '0.5rem' }}>
+              <div style={{ 
+                width: `${decision.signal_quality}%`, 
+                height: '100%', 
+                background: getSQIColor(decision.signal_quality), 
+                borderRadius: '2px',
+                transition: 'width 0.8s ease-in-out'
+              }} />
+            </div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1.3 }}>
+              🔒 <strong>Anti-Whipsaw Filter</strong> dynamically scales target thresholds based on Kaufman Efficiency Ratio & volatility indices to prevent false-breakout capital drag.
+            </div>
+          </div>
+        )}
+
         {/* Confidence Gauge */}
-        <div style={{ marginTop: '1rem' }}>
+        <div style={{ marginTop: '0.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.5rem' }}>
             <span style={{ color: 'var(--text-muted)' }}>Consensus Confidence</span>
             <span>{Math.round(decision.confidence * 100)}%</span>
